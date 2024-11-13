@@ -1,8 +1,18 @@
 // TODO: `easy_ticket` should panic when the title is invalid.
 //   When the description is invalid, instead, it should use a default description:
 //   "Description not provided".
+
 fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
-    todo!()
+    match Ticket::new(title.clone(), description, status.clone()) {
+        Ok(ticket) => ticket,
+        Err(error) => {
+            if error.contains("Description") {
+                Ticket::new(title, "Description not provided".to_string(), status).unwrap()
+            } else {
+                panic!("{}", error)
+            }
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -10,6 +20,12 @@ struct Ticket {
     title: String,
     description: String,
     status: Status,
+}
+
+impl std::fmt::Display for Ticket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:#} {:#} {:#?}", self.title, self.description, self.status)
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]

@@ -8,6 +8,36 @@ enum Status {
     Done,
 }
 
+#[derive(Debug)]
+// Both TryFrom and TryInto have an associated Error type. 
+// This allows each implementation to specify its own error type
+struct ConvertStatusError {
+    invalid_status: String,
+}
+
+impl TryFrom<String> for Status {
+    type Error = ConvertStatusError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        value.as_str().try_into()
+    }
+}
+
+impl TryFrom<&str> for Status {
+    type Error = ConvertStatusError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "todo" => Ok(Status::ToDo),
+            "inprogress" => Ok(Status::InProgress),
+            "done" => Ok(Status::Done),
+            _ => Err(ConvertStatusError {
+                invalid_status: value.to_string(),
+            }),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
